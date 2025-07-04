@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://hellboysy50:mGMh80ne8IAFte8X@cluster0.xqq3v7z.mongodb.net/checkout_system?retryWrites=true&w=majority';
-
+import dotenv from 'dotenv';
+dotenv.config();
+const MONGODB_URI = process.env.MONGODB_URI||'';
 const connectDB = async (): Promise<void> => {
   try {
     const conn = await mongoose.connect(MONGODB_URI);
