@@ -1,0 +1,405 @@
+{
+  "info": {
+    "name": "Checkout System API",
+    "description": "Complete API collection for testing the checkout system with discount rules",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api",
+      "type": "string"
+    },
+    {
+      "key": "cartId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/A",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "A"]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"E\",\n  \"name\": \"Product E\",\n  \"price\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart Operations",
+      "item": [
+        {
+          "name": "Create Cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.success && response.data.id) {",
+                  "    pm.collectionVariables.set('cartId', response.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/carts",
+              "host": ["{{baseUrl}}"],
+              "path": ["carts"]
+            }
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"A\",\n  \"quantity\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["carts", "{{cartId}}", "items"]
+            }
+          }
+        },
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["carts", "{{cartId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Cart Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["carts", "{{cartId}}", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}/items/A",
+              "host": ["{{baseUrl}}"],
+              "path": ["carts", "{{cartId}}", "items", "A"]
+            }
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/carts/{{cartId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["carts", "{{cartId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test Scenarios",
+      "item": [
+        {
+          "name": "Test Case 1: A, B, C = Rs 100",
+          "item": [
+            {
+              "name": "1. Create Cart for Test 1",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();",
+                      "pm.collectionVariables.set('test1CartId', response.data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/carts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts"]
+                }
+              }
+            },
+            {
+              "name": "2. Add Product A",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"A\",\n  \"quantity\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test1CartId}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test1CartId}}", "items"]
+                }
+              }
+            },
+            {
+              "name": "3. Add Product B",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"B\",\n  \"quantity\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test1CartId}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test1CartId}}", "items"]
+                }
+              }
+            },
+            {
+              "name": "4. Add Product C",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"C\",\n  \"quantity\": 1\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test1CartId}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test1CartId}}", "items"]
+                }
+              }
+            },
+            {
+              "name": "5. Get Summary - Should be Rs 100",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();",
+                      "pm.test('Total should be Rs 100', function () {",
+                      "    pm.expect(response.data.finalTotal).to.eql(100);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test1CartId}}/summary",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test1CartId}}", "summary"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Test Case 2: B, A, B, A, A = Rs 120",
+          "item": [
+            {
+              "name": "1. Create Cart for Test 2",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();",
+                      "pm.collectionVariables.set('test2CartId', response.data.id);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/carts",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts"]
+                }
+              }
+            },
+            {
+              "name": "2. Add Items (3 A's, 2 B's)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"A\",\n  \"quantity\": 3\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test2CartId}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test2CartId}}", "items"]
+                }
+              }
+            },
+            {
+              "name": "3. Add B Items",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"productId\": \"B\",\n  \"quantity\": 2\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test2CartId}}/items",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test2CartId}}", "items"]
+                }
+              }
+            },
+            {
+              "name": "4. Get Summary - Should be Rs 120",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();",
+                      "pm.test('Total should be Rs 120', function () {",
+                      "    pm.expect(response.data.finalTotal).to.eql(120);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/carts/{{test2CartId}}/summary",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["carts", "{{test2CartId}}", "summary"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
